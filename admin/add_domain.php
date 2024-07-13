@@ -1,23 +1,12 @@
 <?php
-session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: login.php');
-    exit;
-}
+include '../translate.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $new_domain = [
-        'domain' => $_POST['domain'],
-        'account' => $_POST['account'],
-        'password' => $_POST['password'],
-        'price' => (float) $_POST['price'],
-        'currency' => 'USDT'
-    ];
-    $domains = json_decode(file_get_contents('../data/domains.json'), true);
-    $domains[] = $new_domain;
-    file_put_contents('../data/domains.json', json_encode($domains));
-    header('Location: index.php');
-    exit;
+$settings = json_decode(file_get_contents('../data/settings.json'), true);
+$selectedLang = isset($_GET['lang']) ? $_GET['lang'] : 'ZH';
+
+function t($text) {
+    global $selectedLang;
+    return translate($text, $selectedLang);
 }
 ?>
 
@@ -25,33 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>添加域名</title>
+    <title><?php echo t('添加域名'); ?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>添加域名</h1>
-        <form method="POST">
+        <h1><?php echo t('添加域名'); ?></h1>
+        <form method="post" action="save_domain.php">
             <div class="form-group">
-                <label for="domain">域名:</label>
-                <input type="text" class="form-control" id="domain" name="domain" required>
+                <label for="domain"><?php echo t('域名'); ?></label>
+                <input type="text" class="form-control" id="domain" name="domain">
             </div>
             <div class="form-group">
-                <label for="account">所属账号:</label>
-                <input type="text" class="form-control" id="account" name="account" required>
+                <label for="price"><?php echo t('价格'); ?></label>
+                <input type="text" class="form-control" id="price" name="price">
             </div>
-            <div class="form-group">
-                <label for="password">账号密码:</label>
-                <input type="text" class="form-control" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="price">价格 (USDT):</label>
-                <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-            </div>
-            <button type="submit" class="btn btn-primary">添加</button>
+            <button type="submit" class="btn btn-primary"><?php echo t('保存'); ?></button>
         </form>
-        <a href="index.php" class="btn btn-secondary mt-3">返回</a>
     </div>
+    <script>
+        function changeLanguage(lang) {
+            window.location.href = '?lang=' + lang;
+        }
+    </script>
+    <footer>
+        <p><?php echo t('Powered by DeepLX API'); ?></p>
+    </footer>
 </body>
 </html>
