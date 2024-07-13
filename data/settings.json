@@ -8,5 +8,6 @@
     "admin_password": "hashed_admin_password",
     "exchange_rate_api_key": "https://api.exchangerate-api.com/v4/latest/USDT",
     "crypto_apis_key": "your_crypto_apis_key"  // 新增字段
+    "deeplx_api_key": "V3VOAZVHWMBErIoufT0dqfgoyZ_F83h3e2DIf0wmIpg"
 }
 
