@@ -1,15 +1,12 @@
 <?php
-session_start();
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $password = $_POST['password'];
-    $settings = json_decode(file_get_contents('../data/settings.json'), true);
-    if (password_verify($password, $settings['admin_password'])) {
-        $_SESSION['admin_logged_in'] = true;
-        header('Location: index.php');
-        exit;
-    } else {
-        $error = "密码错误";
-    }
+include '../translate.php';
+
+$settings = json_decode(file_get_contents('../data/settings.json'), true);
+$selectedLang = isset($_GET['lang']) ? $_GET['lang'] : 'ZH';
+
+function t($text) {
+    global $selectedLang;
+    return translate($text, $selectedLang);
 }
 ?>
 
@@ -17,21 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>管理员登录</title>
+    <title><?php echo t('登录'); ?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>管理员登录</h1>
-        <?php if (isset($error)) echo "<div class='alert alert-danger'>$error</div>"; ?>
-        <form method="POST">
+        <h1><?php echo t('用户登录'); ?></h1>
+        <form method="post" action="authenticate.php">
             <div class="form-group">
-                <label for="password">密码:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <label for="username"><?php echo t('用户名'); ?></label>
+                <input type="text" class="form-control" id="username" name="username">
             </div>
-            <button type="submit" class="btn btn-primary">登录</button>
+            <div class="form-group">
+                <label for="password"><?php echo t('密码'); ?></label>
+                <input type="password" class="form-control" id="password" name="password">
+            </div>
+            <button type="submit" class="btn btn-primary"><?php echo t('登录'); ?></button>
         </form>
     </div>
+    <script>
+        function changeLanguage(lang) {
+            window.location.href = '?lang=' + lang;
+        }
+    </script>
+    <footer>
+        <p><?php echo t('Powered by DeepLX API'); ?></p>
+    </footer>
 </body>
 </html>
