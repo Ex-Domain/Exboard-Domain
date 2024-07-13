@@ -1,89 +1,65 @@
 <?php
-$domain_name = $_GET['domain'];
+include 'translate.php';
+
 $domains = json_decode(file_get_contents('data/domains.json'), true);
 $settings = json_decode(file_get_contents('data/settings.json'), true);
+$selectedLang = isset($_GET['lang']) ? $_GET['lang'] : 'ZH';
 
-$domain = null;
+$domain = $_GET['domain'];
+$selectedDomain = null;
+
 foreach ($domains as $d) {
-    if ($d['domain'] === $domain_name) {
-        $domain = $d;
+    if ($d['domain'] == $domain) {
+        $selectedDomain = $d;
         break;
     }
 }
 
-if ($domain === null) {
-    die('域名不存在');
+if ($selectedDomain === null) {
+    die('域名未找到');
 }
 
-// 获取不同货币的支付地址
-$currency_address = [
-    'USDT' => $settings['usdt_address'],
-    'ETH' => $settings['eth_address'],
-    'BTC' => $settings['btc_address'],
-    'USDC' => $settings['usdc_address'],
-    'BCH' => $settings['bch_address'],
-    'DOGE' => $settings['doge_address'],
-];
-
-$exchange_rates = json_decode(file_get_contents('https://api.cryptoapis.io/v1/exchange-rates/latest/USDT'), true);
-$price_in_usdt = $domain['price'];
+function t($text) {
+    global $selectedLang;
+    return translate($text, $selectedLang);
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>购买 <?php echo htmlspecialchars($domain_name); ?></title>
+    <title><?php echo t('购买域名'); ?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">域名售卖</a>
+        <a class="navbar-brand" href="index.php?lang=<?php echo $selectedLang; ?>"><?php echo t('域名售卖'); ?></a>
+        <div class="ml-auto">
+            <select id="language-select" onchange="changeLanguage(this.value)">
+                <option value="ZH" <?php echo $selectedLang == 'ZH' ? 'selected' : ''; ?>>中文</option>
+                <option value="EN" <?php echo $selectedLang == 'EN' ? 'selected' : ''; ?>>English</option>
+                <!-- Add other language options -->
+            </select>
+        </div>
     </nav>
     <div class="container">
-        <h1>购买 <?php echo htmlspecialchars($domain_name); ?></h1>
-        <p>价格: <?php echo htmlspecialchars($price_in_usdt); ?> USDT</p>
-        <form method="POST">
-            <div class="form-group">
-                <label for="account">请输入您的账号:</label>
-                <input type="text" class="form-control" id="account" name="account" required>
-            </div>
-            <div class="form-group">
-                <label for="currency">选择支付货币:</label>
-                <select class="form-control" id="currency" name="currency">
-                    <?php foreach ($currency_address as $currency => $address): ?>
-                        <option value="<?php echo htmlspecialchars($currency); ?>"><?php echo htmlspecialchars($currency); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="txid">交易ID:</label>
-                <input type="text" class="form-control" id="txid" name="txid" required>
-            </div>
-            <button type="submit" class="btn btn-primary">提交</button>
-        </form>
-
-        <?php
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $account = $_POST['account'];
-            $currency = $_POST['currency'];
-            $txid = $_POST['txid'];
-            $address = $currency_address[$currency];
-
-            // 调用API检测转账情况
-            include('admin/config.php');
-            $transaction = checkTransactionStatus($txid, strtolower($currency));
-            if ($transaction && $transaction['data']['status'] === 'confirmed') {
-                // 示例：假设成功付款
-                echo "<p>支付地址: " . htmlspecialchars($address) . "</p>";
-                echo "<p>购买成功，您的账号是: " . htmlspecialchars($account) . "</p>";
-            } else {
-                echo "<p>交易未完成，请稍后重试。</p>";
-            }
-        }
-        ?>
+        <h1><?php echo t('购买域名'); ?></h1>
+        <p><?php echo t('域名'); ?>: <?php echo htmlspecialchars($selectedDomain['domain']); ?></p>
+        <p><?php echo t('价格'); ?>: <?php echo htmlspecialchars($selectedDomain['price']); ?> USDT</p>
+        <!-- 购买表单 -->
     </div>
+    <script>
+        function changeLanguage(lang) {
+            window.location.href = '?domain=<?php echo urlencode($domain); ?>&lang=' + lang;
+        }
+    </script>
+    <footer>
+        <p><?php echo t('Powered by DeepLX API'); ?></p>
+    </footer>
 </body>
+</html>
+
 </html>
 
