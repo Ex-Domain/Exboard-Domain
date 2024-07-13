@@ -1,0 +1,19 @@
+body {
+    padding-top: 50px;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.container {
+    max-width: 800px;
+}
+
+h1, h2 {
+    margin-bottom: 20px;
+}
