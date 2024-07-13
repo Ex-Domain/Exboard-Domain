@@ -6,6 +6,8 @@ if (!isset($_SESSION['admin_logged_in'])) {
 }
 
 include('config.php');
+
+// 调用更新价格的函数
 updatePrices();
 
 $domains = json_decode(file_get_contents('../data/domains.json'), true);
