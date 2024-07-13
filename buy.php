@@ -15,6 +15,7 @@ if ($domain === null) {
     die('域名不存在');
 }
 
+// 获取不同货币的支付地址
 $currency_address = [
     'USDT' => $settings['usdt_address'],
     'ETH' => $settings['eth_address'],
@@ -24,7 +25,7 @@ $currency_address = [
     'DOGE' => $settings['doge_address'],
 ];
 
-$exchange_rates = json_decode(file_get_contents('https://api.exchangerate-api.com/v4/latest/USDT'), true);
+$exchange_rates = json_decode(file_get_contents('https://api.cryptoapis.io/v1/exchange-rates/latest/USDT'), true);
 $price_in_usdt = $domain['price'];
 ?>
 
@@ -56,6 +57,10 @@ $price_in_usdt = $domain['price'];
                     <?php endforeach; ?>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="txid">交易ID:</label>
+                <input type="text" class="form-control" id="txid" name="txid" required>
+            </div>
             <button type="submit" class="btn btn-primary">提交</button>
         </form>
 
@@ -63,39 +68,22 @@ $price_in_usdt = $domain['price'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $account = $_POST['account'];
             $currency = $_POST['currency'];
+            $txid = $_POST['txid'];
             $address = $currency_address[$currency];
-            $api_key = $settings['crypto_apis_key'];
 
-            // 示例：调用 Crypto APIs 进行交易检测
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, "https://api.cryptoapis.io/v1/bc/$currency/testnet/address/$address/transactions");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                "Content-Type: application/json",
-                "X-API-Key: $api_key"
-            ]);
-
-            $response = curl_exec($ch);
-            curl_close($ch);
-
-            $transactions = json_decode($response, true);
-            $payment_received = false;
-
-            foreach ($transactions['payload'] as $transaction) {
-                if ($transaction['status'] === 'confirmed') {
-                    $payment_received = true;
-                    break;
-                }
-            }
-
-            if ($payment_received) {
+            // 调用API检测转账情况
+            include('admin/config.php');
+            $transaction = checkTransactionStatus($txid, strtolower($currency));
+            if ($transaction && $transaction['data']['status'] === 'confirmed') {
+                // 示例：假设成功付款
                 echo "<p>支付地址: " . htmlspecialchars($address) . "</p>";
                 echo "<p>购买成功，您的账号是: " . htmlspecialchars($account) . "</p>";
             } else {
-                echo "<p>付款未确认，请稍后再试。</p>";
+                echo "<p>交易未完成，请稍后重试。</p>";
             }
         }
         ?>
     </div>
 </body>
 </html>
+
