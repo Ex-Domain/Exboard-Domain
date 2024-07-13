@@ -29,3 +29,5 @@ Exboard-domain/
 ├── css/
 
 │   └── styles.css
+
+├── translate.php
