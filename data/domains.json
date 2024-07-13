@@ -1,0 +1,9 @@
+[
+    {
+        "domain": "example.com",
+        "account": "account@example.com",
+        "password": "password",
+        "price": 100,  // 价格以USDT为基础
+        "currency": "USDT"
+    }
+]
