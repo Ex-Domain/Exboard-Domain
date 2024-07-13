@@ -5,6 +5,9 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit;
 }
 
+include('config.php');
+updatePrices();
+
 $domains = json_decode(file_get_contents('../data/domains.json'), true);
 ?>
 
