@@ -1,4 +1,4 @@
-domain-sales/
+Exboard-domain/
 ├── index.php
 ├── buy.php
 ├── admin/
