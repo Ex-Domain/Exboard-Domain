@@ -1,0 +1,10 @@
+{
+    "eth_address": "0xYourEthAddress",
+    "btc_address": "YourBtcAddress",
+    "usdc_address": "YourUsdcAddress",
+    "usdt_address": "YourUsdtAddress",
+    "bch_address": "YourBchAddress",
+    "doge_address": "YourDogeAddress",
+    "admin_password": "hashed_admin_password",
+    "api_key": "your_exchange_rate_api_key"  // 汇率API密钥
+}
